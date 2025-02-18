@@ -11,3 +11,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+  flyway:
+    url: jdbc:mysql://localhost:3306/heathappservice
+    user: heathappservice
+    password: heathappservice
+    locations: classpath:db/migration
