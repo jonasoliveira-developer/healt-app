@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+
+  mysql:
+    image: mysql:8.0.22
+    container_name: mysql_db
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_USER: heathappservice
+      MYSQL_PASSWORD: heathappservice
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: heathappservice
