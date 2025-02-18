@@ -1,19 +1,21 @@
 package br.com.jns.heathapp_service.models.enums;
 
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Arrays;
 
 
 @Getter
-@AllArgsConstructor
 public enum ProfileEnum {
    ROLE_ADMIN("ROLE_ADMIN"),
    ROLE_CLIENT("ROLE_CLIENT");
 
     private final String description;
+
+    ProfileEnum( String description) {
+        this.description = description;
+    }
 
 
 
