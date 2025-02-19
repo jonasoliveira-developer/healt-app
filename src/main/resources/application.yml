@@ -17,3 +17,7 @@ spring:
     user: heathappservice
     password: heathappservice
     locations: classpath:db/migration
+
+  server:
+    servlet:
+      context-path: /health-app/v1
