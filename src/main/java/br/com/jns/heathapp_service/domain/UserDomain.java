@@ -1,16 +1,20 @@
 package br.com.jns.heathapp_service.domain;
 
+import br.com.jns.heathapp_service.models.enums.ProfileEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Table(name = "user")
-@Entity
+import java.io.Serializable;
+import java.util.Set;
+
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDomain {
+@Entity
+public class UserDomain implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -19,5 +23,7 @@ public class UserDomain {
     private String email;
     private String password;
 
-    //private Set<ProfileEnum> profile;
+    @Enumerated(EnumType.STRING)
+    @ElementCollection
+    private Set<ProfileEnum> profile;
 }
