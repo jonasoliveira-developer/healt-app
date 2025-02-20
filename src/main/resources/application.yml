@@ -18,6 +18,9 @@ spring:
     password: heathappservice
     locations: classpath:db/migration
 
-  server:
-    servlet:
-      context-path: /health-app/v1
+
+springdoc:
+  openapi:
+    title: "Helth App API"
+    description: "Documentation to API"
+    version: '1.0.0'
