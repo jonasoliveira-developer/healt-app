@@ -1,5 +1,6 @@
 package br.com.jns.heathapp_service.service;
 
+import br.com.jns.heathapp_service.models.exceptions.ObjectNotFoundException;
 import br.com.jns.heathapp_service.models.mapper.UserMapper;
 import br.com.jns.heathapp_service.models.responses.UserResponse;
 import br.com.jns.heathapp_service.repository.UserRepository;
@@ -14,7 +15,10 @@ public class UserService {
 
         public UserResponse findById(final String id) {
             return mapper.fromEntity(
-                    repository.findById(id).orElse(null)
+                    repository.findById(id).orElseThrow(
+                            () -> new ObjectNotFoundException(
+                                    "Obeject not found Id: " + id + ", Type: " + UserResponse.class.getSimpleName())
+                    )
             );
         }
 }
