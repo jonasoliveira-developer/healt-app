@@ -1,6 +1,7 @@
 package br.com.jns.heathapp_service.service;
 
-import br.com.jns.heathapp_service.domain.UserDomain;
+import br.com.jns.heathapp_service.models.mapper.UserMapper;
+import br.com.jns.heathapp_service.models.responses.UserResponse;
 import br.com.jns.heathapp_service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,8 +10,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository repository;
+    private final UserMapper mapper;
 
-        public UserDomain findById(final String id) {
-            return repository.findById(id).orElse(null);
+        public UserResponse findById(final String id) {
+            return mapper.fromEntity(
+                    repository.findById(id).orElse(null)
+            );
         }
 }
