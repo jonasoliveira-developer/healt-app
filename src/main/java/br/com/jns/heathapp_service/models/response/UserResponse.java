@@ -1,7 +1,6 @@
-package br.com.jns.heathapp_service.models.responses;
+package br.com.jns.heathapp_service.models.response;
 
 import br.com.jns.heathapp_service.models.enums.ProfileEnum;
-import jakarta.persistence.*;
 
 import java.io.Serial;
 import java.io.Serializable;

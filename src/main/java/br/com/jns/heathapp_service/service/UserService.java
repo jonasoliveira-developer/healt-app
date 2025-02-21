@@ -2,7 +2,8 @@ package br.com.jns.heathapp_service.service;
 
 import br.com.jns.heathapp_service.models.exceptions.ObjectNotFoundException;
 import br.com.jns.heathapp_service.models.mapper.UserMapper;
-import br.com.jns.heathapp_service.models.responses.UserResponse;
+import br.com.jns.heathapp_service.models.request.CreateUserRequest;
+import br.com.jns.heathapp_service.models.response.UserResponse;
 import br.com.jns.heathapp_service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,4 +22,8 @@ public class UserService {
                     )
             );
         }
+
+    public void save(CreateUserRequest request) {
+            repository.save(mapper.fromRequest(request));
+    }
 }
