@@ -4,6 +4,7 @@ import br.com.jns.heathapp_service.models.exceptions.ObjectNotFoundException;
 import br.com.jns.heathapp_service.models.exceptions.StandardError;
 import br.com.jns.heathapp_service.models.exceptions.ValidationException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -34,6 +35,23 @@ public class ControllerExceptionsHandle {
                         .build()
         );
     }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    ResponseEntity<StandardError> dataIntegrityViolationException(
+            final DataIntegrityViolationException ex,
+            final HttpServletRequest request
+    ) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                StandardError.builder()
+                        .timestamp(now())
+                        .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                        .status(HttpStatus.BAD_REQUEST.value())
+                        .message(ex.getMessage())
+                        .path(request.getRequestURI())
+                        .build()
+        );
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ResponseEntity<ValidationException> methodArgumentNotValidException(
             final MethodArgumentNotValidException ex,
@@ -43,7 +61,7 @@ public class ControllerExceptionsHandle {
                 .builder()
                         .timestamp(now())
                         .error("Validation Exception")
-                        .status(HttpStatus.NOT_FOUND.value())
+                        .status(HttpStatus.BAD_REQUEST.value())
                         .message("Exception in validation attributes")
                         .path(request.getRequestURI())
                         .errors(new ArrayList<>())

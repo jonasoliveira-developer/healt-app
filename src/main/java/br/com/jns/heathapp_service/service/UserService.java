@@ -6,6 +6,7 @@ import br.com.jns.heathapp_service.models.request.CreateUserRequest;
 import br.com.jns.heathapp_service.models.response.UserResponse;
 import br.com.jns.heathapp_service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,7 +24,20 @@ public class UserService {
             );
         }
 
-    public void save(CreateUserRequest request) {
-            repository.save(mapper.fromRequest(request));
-    }
+        public void save(CreateUserRequest request) {
+            verifyIfEmailAlreadyExists(request.email(),null);
+
+                repository.save(mapper.fromRequest(request));
+        }
+        private void verifyIfEmailAlreadyExists(final String email, final String id) {
+            repository.findByEmail(email)
+                    .filter(user -> !user.getId().equals(id))
+                    .ifPresent(user -> {
+                        throw new DataIntegrityViolationException("Email: ["+email+"] already exists");
+                    });
+        }
+
+
+
+
 }
