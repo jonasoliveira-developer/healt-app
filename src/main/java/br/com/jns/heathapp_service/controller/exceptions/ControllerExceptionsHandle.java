@@ -41,11 +41,11 @@ public class ControllerExceptionsHandle {
             final DataIntegrityViolationException ex,
             final HttpServletRequest request
     ) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
                 StandardError.builder()
                         .timestamp(now())
-                        .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                        .status(HttpStatus.BAD_REQUEST.value())
+                        .error(HttpStatus.CONFLICT.getReasonPhrase())
+                        .status(HttpStatus.CONFLICT.value())
                         .message(ex.getMessage())
                         .path(request.getRequestURI())
                         .build()

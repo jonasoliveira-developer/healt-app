@@ -4,6 +4,7 @@ import br.com.jns.heathapp_service.models.exceptions.StandardError;
 import br.com.jns.heathapp_service.models.request.CreateUserRequest;
 import br.com.jns.heathapp_service.models.response.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,6 +13,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -58,4 +61,31 @@ public interface UserController {
     })
     @PostMapping
     ResponseEntity<Void> save(@Valid @RequestBody CreateUserRequest request);
+
+    @Operation(summary = "List users")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User List",
+                    content = @Content(
+                            mediaType = APPLICATION_JSON_VALUE,
+                            array = @ArraySchema(schema = @Schema(implementation = UserResponse.class))
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400", description = "Bad request",
+                    content = @Content(
+                            mediaType = APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = StandardError.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500", description = "Internal server error",
+                    content = @Content(
+                            mediaType = APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = StandardError.class)
+                    )
+            )
+
+    })
+    @GetMapping
+    ResponseEntity<List<UserResponse>> findAll();
 }
