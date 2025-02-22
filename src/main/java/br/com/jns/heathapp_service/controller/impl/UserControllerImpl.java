@@ -2,6 +2,7 @@ package br.com.jns.heathapp_service.controller.impl;
 
 import br.com.jns.heathapp_service.controller.UserController;
 import br.com.jns.heathapp_service.models.request.CreateUserRequest;
+import br.com.jns.heathapp_service.models.request.UpdateUserRequest;
 import br.com.jns.heathapp_service.models.response.UserResponse;
 import br.com.jns.heathapp_service.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -37,5 +38,10 @@ public class UserControllerImpl implements UserController {
     @Override
     public ResponseEntity<List<UserResponse>> findAll() {
         return ResponseEntity.ok().body(service.findAll());
+    }
+
+    @Override
+    public ResponseEntity<UserResponse> update(UpdateUserRequest request, String id) {
+        return ResponseEntity.ok().body(service.update(request, id));
     }
 }

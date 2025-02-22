@@ -2,6 +2,7 @@ package br.com.jns.heathapp_service.controller;
 
 import br.com.jns.heathapp_service.models.exceptions.StandardError;
 import br.com.jns.heathapp_service.models.request.CreateUserRequest;
+import br.com.jns.heathapp_service.models.request.UpdateUserRequest;
 import br.com.jns.heathapp_service.models.response.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -88,4 +89,30 @@ public interface UserController {
     })
     @GetMapping
     ResponseEntity<List<UserResponse>> findAll();
+
+    @Operation(summary = "Update  user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User updated"),
+            @ApiResponse(
+                    responseCode = "400", description = "Bad request",
+                    content = @Content(
+                            mediaType = APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = StandardError.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500", description = "Internal server error",
+                    content = @Content(
+                            mediaType = APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = StandardError.class)
+                    )
+            )
+
+    })
+    @PutMapping("/{id}")
+    ResponseEntity<UserResponse> update(
+            @Valid
+            @RequestBody UpdateUserRequest request,
+            @PathVariable String id
+    );
 }
