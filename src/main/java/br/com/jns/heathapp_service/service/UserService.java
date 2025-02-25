@@ -54,7 +54,7 @@ public class UserService {
         private UserDomain find(String id) {
             return repository.findById(id)
                     .orElseThrow(() -> new ObjectNotFoundException(
-                            "Obeject not found Id: " + id + ", Type: " + UserResponse.class.getSimpleName())
+                            "Object not found Id: " + id + ", Type: " + UserResponse.class.getSimpleName())
             );
         }
 

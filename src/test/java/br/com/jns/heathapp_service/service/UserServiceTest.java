@@ -4,6 +4,7 @@ import br.com.jns.heathapp_service.domain.UserDomain;
 import br.com.jns.heathapp_service.models.exceptions.ObjectNotFoundException;
 import br.com.jns.heathapp_service.models.mapper.UserMapper;
 import br.com.jns.heathapp_service.models.request.CreateUserRequest;
+import br.com.jns.heathapp_service.models.request.UpdateUserRequest;
 import br.com.jns.heathapp_service.models.response.UserResponse;
 import br.com.jns.heathapp_service.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
@@ -107,6 +108,7 @@ class UserServiceTest {
 
         final var request = generateMock(CreateUserRequest.class);
         final var entity = generateMock(UserDomain.class);
+
         when(repository.findByEmail(anyString())).thenReturn(Optional.of(entity));
 
         try {
@@ -121,6 +123,76 @@ class UserServiceTest {
         verify(encoder, times(0)).encode(request.password());
         verify(repository, times(0)).save(any(UserDomain.class));
     }
+
+    @Test
+    void whenCallUpdateWithInvalidIdThenThrowObjectNotFound() {
+
+        final var request = generateMock(UpdateUserRequest.class);
+
+        when(repository.findById(anyString())).thenReturn(Optional.empty());
+
+        try {
+            service.update(request, "test");
+
+        }catch (Exception ex) {
+            assertEquals(ObjectNotFoundException.class, ex.getClass() );
+            assertEquals( "Object not found Id: test, Type: UserResponse" , ex.getMessage());
+        }
+
+        verify(repository, times(1)).findById(anyString());
+        verify(mapper, times(0)).update(any(request.getClass()), any(UserDomain.class));
+        verify(repository, times(0)).save(any(UserDomain.class));
+        verify(encoder, times(0)).encode(request.password());
+
+    }
+
+    @Test
+    void  whenCallUpdateWithEmailAlreadyExistsThrowDataIntegrityViolationException() {
+
+        final var request = generateMock(UpdateUserRequest.class);
+        final var entity = generateMock(UserDomain.class);
+
+        when(repository.findByEmail(anyString())).thenReturn(Optional.of(entity));
+        when(repository.findById(anyString())).thenReturn(Optional.of(entity));
+
+        try {
+            service.update(request, "test");
+        }catch (Exception ex) {
+            assertEquals(DataIntegrityViolationException.class, ex.getClass());
+            assertEquals("Email: ["+request.email()+"] already exists", ex.getMessage());
+
+        }
+
+        verify(repository, times(1)).findByEmail(request.email());
+        verify(repository,times(1)).findById(anyString());
+        verify(mapper, times(0)).update(any(), any());
+        verify(encoder, times(0)).encode(anyString());
+        verify(repository, times(0)).save(any(UserDomain.class));
+    }
+
+    @Test
+    void whenCallUpdateWithValidArgumentsThenReturnSuccess() {
+        final var id = "test";
+        final var request = generateMock(UpdateUserRequest.class);
+        final var entity = generateMock(UserDomain.class).withId(id);
+
+        when(repository.findById(anyString())).thenReturn(Optional.of(entity));
+        when(repository.findByEmail(anyString())).thenReturn(Optional.of(entity));
+        when(mapper.update(any(), any())).thenReturn(entity);
+        when(repository.save(any(UserDomain.class))).thenReturn(entity);
+
+        service.update(request, id);
+
+        verify(repository).findById(anyString());
+        verify(repository).findByEmail(request.email());
+        verify(mapper).update(request, entity);
+        verify(encoder).encode(request.password());
+        verify(repository).save(any(UserDomain.class));
+        verify(mapper).fromEntity(any(UserDomain.class));
+
+    }
+
+
 
 
 }
