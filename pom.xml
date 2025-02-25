@@ -100,6 +100,21 @@
 			<version>2.8.5</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-crypto</artifactId>
+			<version>6.4.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-inline</artifactId>
+			<version>5.1.1</version>
+			<scope>test</scope>
+		</dependency>
+
+
+
 	</dependencies>
 
 	<build>
@@ -138,6 +153,13 @@
 						</exclude>
 					</excludes>
 				</configuration>
+			</plugin>
+			<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-surefire-plugin</artifactId>
+			<configuration>
+				<argLine>-javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar</argLine>
+			</configuration>
 			</plugin>
 		</plugins>
 	</build>
