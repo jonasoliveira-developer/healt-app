@@ -9,6 +9,7 @@ import br.com.jns.heathapp_service.models.response.UserResponse;
 import br.com.jns.heathapp_service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 public class UserService {
     private final UserRepository repository;
     private final UserMapper mapper;
+    private final BCryptPasswordEncoder encoder;
 
         public UserResponse findById(final String id) {
             return mapper.fromEntity(find(id));
@@ -26,7 +28,9 @@ public class UserService {
         public void save(CreateUserRequest request) {
             verifyIfEmailAlreadyExists(request.email(),null);
 
-                repository.save(mapper.fromRequest(request));
+                repository.save(mapper.fromRequest(request)
+                        .withPassword(encoder.encode(request.password()))
+                );
         }
 
         public List<UserResponse> findAll() {
@@ -40,7 +44,11 @@ public class UserService {
             var entity = find(id);
             verifyIfEmailAlreadyExists(request.email(), id);
 
-            return mapper.fromEntity(repository.save(mapper.update(request, entity)));
+            return mapper.fromEntity(repository.save(mapper.update(request, entity)
+                    .withPassword(request.password() != null
+                            ? encoder.encode(request.password())
+                            : entity.getPassword())
+            ));
         }
 
         private UserDomain find(String id) {
