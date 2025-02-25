@@ -3,6 +3,7 @@ package br.com.jns.heathapp_service.service;
 import br.com.jns.heathapp_service.domain.UserDomain;
 import br.com.jns.heathapp_service.models.exceptions.ObjectNotFoundException;
 import br.com.jns.heathapp_service.models.mapper.UserMapper;
+import br.com.jns.heathapp_service.models.request.CreateUserRequest;
 import br.com.jns.heathapp_service.models.response.UserResponse;
 import br.com.jns.heathapp_service.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
@@ -10,11 +11,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
 
+import static br.com.jns.heathapp_service.creator.CreatorUtils.generateMock;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,7 +43,7 @@ class UserServiceTest {
     void whenCallFindByIdWithValidIdThenReturnUserResponse() {
 
         when(repository.findById(anyString())).thenReturn(Optional.of(new UserDomain()));
-        when(mapper.fromEntity(any(UserDomain.class))).thenReturn(mock(UserResponse.class));
+        when(mapper.fromEntity(any(UserDomain.class))).thenReturn(generateMock(UserResponse.class));
 
         final var response = service.findById("test");
 
@@ -79,6 +82,44 @@ class UserServiceTest {
 
         verify(repository, times(1)).findAll();
         verify(mapper, times(2)).fromEntity(any(UserDomain.class));
+    }
+
+    @Test
+    void whenCallSaveThenSuccess() {
+
+        final var request = generateMock(CreateUserRequest.class);
+
+        when(mapper.fromRequest(any(CreateUserRequest.class))).thenReturn( new UserDomain());
+        when(encoder.encode(anyString())).thenReturn("encoded");
+        when(repository.save(any(UserDomain.class))).thenReturn(new UserDomain());
+        when(repository.findByEmail(anyString())).thenReturn(Optional.empty());
+
+        service.save(request);
+
+        verify(mapper, times(1)).fromRequest(request);
+        verify(encoder, times(1)).encode(request.password());
+        verify(repository, times(1)).findByEmail(request.email());
+
+    }
+
+    @Test
+    void whenCallSaveWithEmailAlreadyExistsThrowDataIntegrityViolationException() {
+
+        final var request = generateMock(CreateUserRequest.class);
+        final var entity = generateMock(UserDomain.class);
+        when(repository.findByEmail(anyString())).thenReturn(Optional.of(entity));
+
+        try {
+            service.save(request);
+        } catch (Exception ex) {
+           assertEquals(DataIntegrityViolationException.class, ex.getClass());
+           assertEquals("Email: ["+request.email()+"] already exists", ex.getMessage());
+        }
+
+        verify(repository, times(1)).findByEmail(request.email());
+        verify(mapper, times(0)).fromRequest(request);
+        verify(encoder, times(0)).encode(request.password());
+        verify(repository, times(0)).save(any(UserDomain.class));
     }
 
 
