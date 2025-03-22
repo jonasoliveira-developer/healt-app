@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,48 +22,49 @@ public class UserService {
     private final UserMapper mapper;
     private final BCryptPasswordEncoder encoder;
 
-        public UserResponse findById(final String id) {
-            return mapper.fromEntity(find(id));
-        }
+    public UserResponse findById(final String id) {
+        return mapper.fromEntity(find(id));
+    }
 
-        public void save(CreateUserRequest request) {
-            verifyIfEmailAlreadyExists(request.email(),null);
+    @Transactional
+    public void save(CreateUserRequest request) {
+        verifyIfEmailAlreadyExists(request.email(), null);
 
-                repository.save(mapper.fromRequest(request)
-                        .withPassword(encoder.encode(request.password()))
+        repository.save(mapper.fromRequest(request)
+                .withPassword(encoder.encode(request.password()))
+        );
+    }
+
+    public List<UserResponse> findAll() {
+        return repository.findAll()
+                .stream()
+                .map(mapper::fromEntity)
+                .toList();
+    }
+
+    public UserResponse update(final UpdateUserRequest request, final String id) {
+        var entity = find(id);
+        verifyIfEmailAlreadyExists(request.email(), id);
+
+        return mapper.fromEntity(repository.save(mapper.update(request, entity)
+                .withPassword(request.password() != null
+                        ? encoder.encode(request.password())
+                        : entity.getPassword())
+        ));
+    }
+
+    private UserDomain find(String id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException(
+                        "Object not found Id: " + id + ", Type: " + UserResponse.class.getSimpleName())
                 );
-        }
+    }
 
-        public List<UserResponse> findAll() {
-                return repository.findAll()
-                        .stream()
-                        .map(mapper::fromEntity)
-                        .toList();
-        }
-
-        public UserResponse update( final UpdateUserRequest request, final String id) {
-            var entity = find(id);
-            verifyIfEmailAlreadyExists(request.email(), id);
-
-            return mapper.fromEntity(repository.save(mapper.update(request, entity)
-                    .withPassword(request.password() != null
-                            ? encoder.encode(request.password())
-                            : entity.getPassword())
-            ));
-        }
-
-        private UserDomain find(String id) {
-            return repository.findById(id)
-                    .orElseThrow(() -> new ObjectNotFoundException(
-                            "Object not found Id: " + id + ", Type: " + UserResponse.class.getSimpleName())
-            );
-        }
-
-        private void verifyIfEmailAlreadyExists(final String email, final String id) {
-            repository.findByEmail(email)
-                    .filter(user -> !user.getId().equals(id))
-                    .ifPresent(user -> {
-                        throw new DataIntegrityViolationException("Email: ["+email+"] already exists");
-                    });
-        }
+    private void verifyIfEmailAlreadyExists(final String email, final String id) {
+        repository.findByEmail(email)
+                .filter(user -> !user.getId().equals(id))
+                .ifPresent(user -> {
+                    throw new DataIntegrityViolationException("Email: [" + email + "] already exists");
+                });
+    }
 }

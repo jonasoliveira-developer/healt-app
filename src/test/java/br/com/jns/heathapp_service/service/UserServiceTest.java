@@ -7,7 +7,6 @@ import br.com.jns.heathapp_service.models.request.CreateUserRequest;
 import br.com.jns.heathapp_service.models.request.UpdateUserRequest;
 import br.com.jns.heathapp_service.models.response.UserResponse;
 import br.com.jns.heathapp_service.repository.UserRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -63,7 +62,7 @@ class UserServiceTest {
             service.findById("test");
         }catch (Exception ex) {
             assertEquals(ObjectNotFoundException.class, ex.getClass());
-            assertEquals("Obeject not found Id: test, Type: UserResponse", ex.getMessage());
+            assertEquals("Object not found Id: test, Type: UserResponse", ex.getMessage());
         }
 
         verify(repository, times(1)).findById(anyString());
