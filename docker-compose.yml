@@ -1,5 +1,14 @@
 version: '3.9'
 
+networks:
+  aw-network:
+    driver: bridge
+
+
+volumes:
+  prometheus_data:
+  grafana_data:
+
 services:
 
   mysql:
@@ -12,3 +21,27 @@ services:
       MYSQL_PASSWORD: heathappservice
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: heathappservice
+
+    networks:
+      - aw-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - aw-network
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - aw-network
+
+

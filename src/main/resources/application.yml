@@ -18,6 +18,28 @@ spring:
     password: heathappservice
     locations: classpath:db/migration
 
+management:
+  metrics:
+    tags:
+      application: "${spring.application.name}"
+  endpoints:
+    enabled-by-default: false
+    web:
+      exposure:
+        include: "health, prometheus, metrics"
+  endpoint:
+    health:
+      enabled: true
+      show-details: always
+    prometheus:
+      enabled: true
+    metrics:
+      enabled: true
+
+logging:
+  pattern:
+    level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
+
 
 springdoc:
   openapi:
