@@ -17,7 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserServiceImpl {
     private final UserRepository repository;
     private final UserMapper mapper;
     private final BCryptPasswordEncoder encoder;

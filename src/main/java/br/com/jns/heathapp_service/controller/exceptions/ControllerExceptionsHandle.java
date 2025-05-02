@@ -1,24 +1,41 @@
 package br.com.jns.heathapp_service.controller.exceptions;
 
 import br.com.jns.heathapp_service.models.exceptions.ObjectNotFoundException;
+import br.com.jns.heathapp_service.models.exceptions.RefreshTokenExpiredException;
 import br.com.jns.heathapp_service.models.exceptions.StandardError;
 import br.com.jns.heathapp_service.models.exceptions.ValidationException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static java.time.LocalDateTime.now;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @ControllerAdvice
 public class ControllerExceptionsHandle {
+
+    @ExceptionHandler({BadCredentialsException.class, RefreshTokenExpiredException.class})
+    ResponseEntity<StandardError> handleBadCredentialsException(final RuntimeException ex, HttpServletRequest request) {
+       return ResponseEntity.status(UNAUTHORIZED).body(
+                StandardError.builder()
+                        .timestamp(now())
+                        .error(UNAUTHORIZED.getReasonPhrase())
+                        .status(UNAUTHORIZED.value())
+                        .message(ex.getMessage())
+                        .path(request.getRequestURI())
+                        .build()
+        );
+    }
+
 
     @ExceptionHandler(ObjectNotFoundException.class)
     ResponseEntity<StandardError> handleNotFoundException(
@@ -32,6 +49,22 @@ public class ControllerExceptionsHandle {
                             .status(HttpStatus.NOT_FOUND.value())
                             .message(ex.getMessage())
                             .path(request.getRequestURI())
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    ResponseEntity<StandardError> usernameNotFoundException(
+            final UsernameNotFoundException ex,
+            final HttpServletRequest request
+    ) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                StandardError.builder()
+                        .timestamp(now())
+                        .error(HttpStatus.NOT_FOUND.getReasonPhrase())
+                        .status(HttpStatus.NOT_FOUND.value())
+                        .message(ex.getMessage())
+                        .path(request.getRequestURI())
                         .build()
         );
     }

@@ -4,7 +4,7 @@ import br.com.jns.heathapp_service.controller.UserController;
 import br.com.jns.heathapp_service.models.request.CreateUserRequest;
 import br.com.jns.heathapp_service.models.request.UpdateUserRequest;
 import br.com.jns.heathapp_service.models.response.UserResponse;
-import br.com.jns.heathapp_service.service.UserService;
+import br.com.jns.heathapp_service.service.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 @Slf4j
 public class UserControllerImpl implements UserController {
 
-    final UserService service;
+    final UserServiceImpl service;
 
     @Override
     public ResponseEntity<UserResponse> findById(String id) {
