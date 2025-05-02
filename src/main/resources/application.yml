@@ -46,3 +46,7 @@ springdoc:
     title: "Helth App API"
     description: "Documentation to API"
     version: '1.0.0'
+
+jwt.secret: "1W5ioe8KZbEVKakA09vPEJh3R8fgKdDE"
+jwt.expiration: 1200000
+jwt.expiration-sec.refresh-token: 3600

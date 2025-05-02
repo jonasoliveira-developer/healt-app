@@ -60,7 +60,7 @@ public interface UserController {
             )
 
     })
-    @PostMapping
+    @PostMapping("/create")
     ResponseEntity<Void> save(@Valid @RequestBody CreateUserRequest request);
 
     @Operation(summary = "List users")
